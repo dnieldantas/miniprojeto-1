@@ -6,7 +6,6 @@ Esta é a peça central do projeto: carrega o JSON uma vez, constrói os
 import json
 from collections import deque
 
-
 class Catalogo:
     def __init__(self, caminho_json: str):
 
@@ -120,6 +119,9 @@ class Catalogo:
             return conteudo["duracao_seg"]
 
         if conteudo["tipo"] == "album":
+            if "faixas" not in conteudo:
+                return None
+
             total_segundos = 0
 
             for faixa in conteudo["faixas"]:
@@ -135,6 +137,10 @@ class Catalogo:
             return None
 
         conteudo = self.conteudos_por_id[conteudo_id]
+
+        if "generos" not in conteudo:
+            return []
+
         generos = []
 
         def adicionar_generos(valor):
@@ -168,7 +174,7 @@ class Catalogo:
         plataformas.sort()
 
         return plataformas
-    
+
     def data_adicionado_de(self, conteudo_id: str) -> str | None:
         if conteudo_id not in self.conteudos_por_id:
             return None
@@ -197,6 +203,9 @@ class Catalogo:
 
         conteudo = self.conteudos_por_id[conteudo_id]
 
+        if conteudo["tipo"] != "musica":
+            return None
+
         if "engajamento" not in conteudo:
             return None
 
@@ -213,8 +222,6 @@ class Catalogo:
     def conteudos_do_genero(self, genero: str) -> list[str]:
         resultado = []
 
-        genero = genero.lower()
-
         for conteudo in self.conteudos:
             generos = self.generos_de(conteudo["id"])
 
@@ -222,7 +229,7 @@ class Catalogo:
                 continue
 
             for genero_conteudo in generos:
-                if genero_conteudo.lower() == genero:
+                if genero_conteudo == genero:
                     resultado.append(conteudo["id"])
                     break
 
@@ -232,10 +239,23 @@ class Catalogo:
 
     # fila
     def enfileirar(self, conteudo_id: str) -> bool:
-        pass
+        if conteudo_id not in self.conteudos_por_id:
+            return False
+
+        self.fila.append(conteudo_id)
+
+        return True
 
     def proximo(self) -> str | None:
-        pass
+        if len(self.fila) == 0:
+            return None
+
+        return self.fila.popleft()
 
     def fila_atual(self) -> list[str]:
-        pass
+        resultado = []
+
+        for conteudo_id in self.fila:
+            resultado.append(conteudo_id)
+
+        return resultado
