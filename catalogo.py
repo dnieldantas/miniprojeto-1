@@ -97,25 +97,138 @@ class Catalogo:
 
     # conteúdo
     def rating_de(self, conteudo_id: str) -> float | None:
-        pass
+        if conteudo_id not in self.conteudos_por_id:
+            return None
+
+        conteudo = self.conteudos_por_id[conteudo_id]
+
+        if "rating" not in conteudo:
+            return None
+
+        return float(conteudo["rating"])
 
     def duracao_total_de(self, conteudo_id: str) -> int | None:
-        pass
+        if conteudo_id not in self.conteudos_por_id:
+            return None
+
+        conteudo = self.conteudos_por_id[conteudo_id]
+
+        if conteudo["tipo"] == "musica":
+            if "duracao_seg" not in conteudo:
+                return None
+
+            return conteudo["duracao_seg"]
+
+        if conteudo["tipo"] == "album":
+            total_segundos = 0
+
+            for faixa in conteudo["faixas"]:
+                if faixa["duracao_seg"] is not None:
+                    total_segundos += faixa["duracao_seg"]
+
+            return total_segundos
+
+        return None
 
     def generos_de(self, conteudo_id: str) -> list[str] | None:
-        pass
+        if conteudo_id not in self.conteudos_por_id:
+            return None
+
+        conteudo = self.conteudos_por_id[conteudo_id]
+        generos = []
+
+        def adicionar_generos(valor):
+            if isinstance(valor, str):
+                generos.append(valor)
+                return
+
+            for item in valor:
+                adicionar_generos(item)
+
+        adicionar_generos(conteudo["generos"])
+
+        generos.sort()
+
+        return generos
 
     def plataformas_de(self, conteudo_id: str) -> list[str] | None:
-        pass
+        if conteudo_id not in self.conteudos_por_id:
+            return None
 
+        conteudo = self.conteudos_por_id[conteudo_id]
+
+        if "plataformas" not in conteudo:
+            return []
+
+        plataformas = []
+
+        for plataforma in conteudo["plataformas"]:
+            plataformas.append(plataforma)
+
+        plataformas.sort()
+
+        return plataformas
+    
     def data_adicionado_de(self, conteudo_id: str) -> str | None:
-        pass
+        if conteudo_id not in self.conteudos_por_id:
+            return None
+
+        conteudo = self.conteudos_por_id[conteudo_id]
+
+        if "data_adicionado" not in conteudo:
+            return None
+
+        data = conteudo["data_adicionado"]
+
+        if "/" in data:
+            partes = data.split("/")
+
+            dia = partes[0]
+            mes = partes[1]
+            ano = partes[2]
+
+            return ano + "-" + mes + "-" + dia
+
+        return data
 
     def execucoes_de(self, conteudo_id: str) -> int | None:
-        pass
+        if conteudo_id not in self.conteudos_por_id:
+            return None
+
+        conteudo = self.conteudos_por_id[conteudo_id]
+
+        if "engajamento" not in conteudo:
+            return None
+
+        if "execucoes" not in conteudo["engajamento"]:
+            return None
+
+        execucoes = conteudo["engajamento"]["execucoes"]
+
+        if isinstance(execucoes, str):
+            execucoes = execucoes.replace(",", "")
+
+        return int(execucoes)
 
     def conteudos_do_genero(self, genero: str) -> list[str]:
-        pass
+        resultado = []
+
+        genero = genero.lower()
+
+        for conteudo in self.conteudos:
+            generos = self.generos_de(conteudo["id"])
+
+            if generos is None:
+                continue
+
+            for genero_conteudo in generos:
+                if genero_conteudo.lower() == genero:
+                    resultado.append(conteudo["id"])
+                    break
+
+        resultado.sort()
+
+        return resultado
 
     # fila
     def enfileirar(self, conteudo_id: str) -> bool:
