@@ -237,6 +237,14 @@ class Catalogo:
 
         return resultado
 
+    def descrever(self, conteudo_id: str) -> str:
+        if conteudo_id not in self.conteudos_por_id:
+            return f"[conteudo {conteudo_id} nao encontrado]"
+
+        conteudo = self.conteudos_por_id[conteudo_id]
+
+        return f"{conteudo['titulo']}, de {conteudo['artista']} ({conteudo['tipo']})"
+
     # fila
     def enfileirar(self, conteudo_id: str) -> bool:
         if conteudo_id not in self.conteudos_por_id:
