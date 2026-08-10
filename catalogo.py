@@ -220,24 +220,22 @@ class Catalogo:
         return int(execucoes)
 
     def conteudos_do_genero(self, genero: str) -> list[str]:
-        resultado = []
+            resultado = []
 
-        genero = genero.lower()
+            for conteudo in self.conteudos:
+                generos = self.generos_de(conteudo["id"])
 
-        for conteudo in self.conteudos:
-            generos = self.generos_de(conteudo["id"])
+                if generos is None:
+                    continue
 
-            if generos is None:
-                continue
+                for genero_conteudo in generos:
+                    if genero_conteudo == genero:
+                        resultado.append(conteudo["id"])
+                        break
 
-            for genero_conteudo in generos:
-                if genero_conteudo.lower() == genero:
-                    resultado.append(conteudo["id"])
-                    break
+            resultado.sort()
 
-        resultado.sort()
-
-        return resultado
+            return resultado
 
     def descrever(self, conteudo_id: str) -> str:
         if conteudo_id not in self.conteudos_por_id:
