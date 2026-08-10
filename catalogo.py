@@ -222,6 +222,8 @@ class Catalogo:
     def conteudos_do_genero(self, genero: str) -> list[str]:
         resultado = []
 
+        genero = genero.lower()
+
         for conteudo in self.conteudos:
             generos = self.generos_de(conteudo["id"])
 
@@ -229,7 +231,7 @@ class Catalogo:
                 continue
 
             for genero_conteudo in generos:
-                if genero_conteudo == genero:
+                if genero_conteudo.lower() == genero:
                     resultado.append(conteudo["id"])
                     break
 
